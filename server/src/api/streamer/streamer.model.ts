@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import Streamer from './streamer';
+import Streamer from './streamer.interface';
 
 const streamerSchema = new Schema<Streamer>({
     name: {
