@@ -9,7 +9,8 @@ const router = (0, express_1.Router)();
 router.get('/', streamer_controller_1.default.getStreamers);
 router.get('/:streamerId', streamer_controller_1.default.getStreamerById);
 router.post('/', streamer_controller_1.default.createStreamer);
-// TODO:
-// router.put('/:streamerId/vote', StreamerController.getStreamers);
+router.put('/:streamerId', streamer_controller_1.default.updateSteamer);
+router.put('/:streamerId/vote', streamer_controller_1.default.voteForStreamer);
+router.delete('/:streamerId', streamer_controller_1.default.deleteStreamer);
 exports.default = router;
 //# sourceMappingURL=streamer.routes.js.map

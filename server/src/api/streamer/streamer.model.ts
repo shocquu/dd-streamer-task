@@ -14,16 +14,11 @@ const streamerSchema = new Schema<Streamer>({
         type: String,
         required: true,
     },
-    upvotesCount: {
-        type: Number,
-        required: true,
-    },
-    downvotesCount: {
-        type: Number,
-        required: true,
-    },
-    totalVotes: Number,
     imageUrl: String,
+    upvotesCount: { type: Number, default: 0 },
+    downvotesCount: { type: Number, default: 0 },
+    totalVotes: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
 });
 
 const Streamer = model<Streamer>('Streamer', streamerSchema);

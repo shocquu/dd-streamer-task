@@ -5,10 +5,11 @@ interface Streamer extends Document {
     name: string;
     description: string;
     platform: Platform;
-    upvotesCount: number;
-    downvotesCount: number;
+    upvotesCount?: number;
+    downvotesCount?: number;
     totalVotes?: number;
     imageUrl?: string;
+    createdAt: Date;
 }
 
 export default Streamer;

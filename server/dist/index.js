@@ -22,4 +22,5 @@ app.use('/streamers', streamer_routes_1.default);
     .catch((error) => {
     console.error('Error connecting to database: ', error);
 });
+exports.default = app;
 //# sourceMappingURL=index.js.map

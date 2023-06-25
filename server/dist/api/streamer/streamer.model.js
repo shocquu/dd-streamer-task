@@ -14,17 +14,11 @@ const streamerSchema = new mongoose_1.Schema({
         type: String,
         required: true,
     },
-    upvotesCount: {
-        type: Number,
-        required: true,
-    },
-    downvotesCount: {
-        type: Number,
-        required: true,
-    },
-    imageUrl: {
-        type: String,
-    },
+    imageUrl: String,
+    upvotesCount: { type: Number, default: 0 },
+    downvotesCount: { type: Number, default: 0 },
+    totalVotes: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
 });
 const Streamer = (0, mongoose_1.model)('Streamer', streamerSchema);
 exports.default = Streamer;

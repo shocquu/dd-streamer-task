@@ -15,15 +15,4 @@ const connectToDatabase = async (): Promise<void> => {
     }
 };
 
-export const connectToTestDatabase = async () => {
-    const databaseURL = process.env.MONGODB_TEST_URI;
-
-    try {
-        await mongoose.connect(databaseURL);
-        console.log('Connected to the test database.');
-    } catch (error) {
-        console.error('Failed to connect to the test database:', error);
-    }
-};
-
 export default connectToDatabase;
