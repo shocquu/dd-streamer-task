@@ -91,11 +91,11 @@ const StreamerController = {
             else
                 streamer.downvotesCount += 1;
             streamer.totalVotes += 1;
-            await streamer.save();
+            await streamer_model_1.default.updateOne({ _id: streamerId }, streamer);
             res.status(200).json({ message: 'Vote updated successfully.' });
         }
         catch (error) {
-            res.status(500).json({ error: `Internal server error: ${error.message}` });
+            res.status(200).json({ error: `Internal server error: ${error.message}` });
         }
     },
 };

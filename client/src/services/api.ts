@@ -1,0 +1,54 @@
+import { VoteType } from '../shared/enums';
+import { AddStreamerData, Streamer } from '../shared/types';
+
+const API_BASE_URL = 'http://localhost:3000';
+
+const handleResponse = async (response: Response) => {
+    const data = await response.json();
+
+    if (response.ok) return data;
+    else throw data;
+};
+
+export const getStreamers = async (): Promise<Streamer[]> => {
+    const response = await fetch(`${API_BASE_URL}/streamers`);
+    return handleResponse(response);
+};
+
+export const getStreamer = async (streamerId: string): Promise<Streamer> => {
+    const response = await fetch(`${API_BASE_URL}/streamers/${streamerId}`);
+    return handleResponse(response);
+};
+
+export const addStreamer = async (streamerData: AddStreamerData): Promise<Streamer> => {
+    const response = await fetch(`${API_BASE_URL}/streamers`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(streamerData),
+    });
+    return handleResponse(response);
+};
+
+export const upvoteStreamer = async (streamerId: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/streamers/${streamerId}/vote`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ voteType: VoteType.Upvote }),
+    });
+    await handleResponse(response);
+};
+
+export const downvoteStreamer = async (streamerId: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/streamers/${streamerId}/vote`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ voteType: VoteType.Downvote }),
+    });
+    await handleResponse(response);
+};
