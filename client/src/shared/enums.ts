@@ -1,6 +1,6 @@
 export enum VoteType {
     Upvote = 'upvote',
-    Downvote = 'upvote',
+    Downvote = 'downvote',
 }
 
 export enum Platform {

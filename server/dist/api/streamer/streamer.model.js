@@ -6,15 +6,12 @@ const streamerSchema = new mongoose_1.Schema({
         type: String,
         required: true,
     },
-    description: {
-        type: String,
-        required: true,
-    },
     platform: {
         type: String,
         required: true,
     },
     imageUrl: String,
+    description: { type: String, default: '' },
     upvotesCount: { type: Number, default: 0 },
     downvotesCount: { type: Number, default: 0 },
     totalVotes: { type: Number, default: 0 },

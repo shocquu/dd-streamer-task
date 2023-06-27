@@ -1,8 +1,9 @@
 export type Streamer = {
-    id: string;
+    _id: string;
     name: string;
     platform: string;
-    description: string;
+    imageUrl?: string;
+    description?: string;
     upvotesCount: number;
     downvotesCount: number;
 };
@@ -10,7 +11,8 @@ export type Streamer = {
 export type AddStreamerData = {
     name: string;
     platform: string;
-    description: string;
+    imageUrl?: string;
+    description?: string;
 };
 
 export type VoteType = 'upvote' | 'downvote';

@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
-import { Platform } from '../shared/enums';
+import Chip from './Chip';
 
-type Record = {
+export type ListRecord = {
+    id: string;
     title: string;
     subtitle: string;
     imageUrl?: string;
@@ -9,28 +10,15 @@ type Record = {
     extra?: ReactNode;
 };
 
-const List = ({ data }: { data: Record[] }) => {
-    const getColor = (platform: any) => {
-        switch (platform) {
-            case Platform.Twitch:
-                return 'bg-twitch';
-            case Platform.Youtube:
-                return 'bg-youtube';
-            case Platform.Tiktok:
-                return 'bg-tiktok';
-            case Platform.Kick:
-                return 'bg-kick';
-            case Platform.Rumble:
-                return 'bg-rumble';
-            default:
-                return 'bg-slate-600';
-        }
-    };
+type ListProps = {
+    data: ListRecord[];
+};
 
+const List = ({ data }: ListProps) => {
     return (
         <ul role='list' className='divide-y divide-gray-100 dark:divide-gray-800'>
-            {data.map(({ title, subtitle, imageUrl, tag, extra }) => (
-                <li key={title} className='flex justify-between items-center gap-x-6 py-5'>
+            {data.map(({ id, title, subtitle, imageUrl, tag, extra }) => (
+                <li key={id} className='flex justify-between items-center gap-x-6 py-5'>
                     <div className='flex gap-x-4'>
                         <span className='inline-block h-12 w-12 bg-gray-100 dark:bg-gray-600 rounded-full overflow-hidden'>
                             {imageUrl ? (
@@ -60,23 +48,34 @@ const List = ({ data }: { data: Record[] }) => {
                             )}
                         </span>
                         <div className='min-w-0 flex-auto'>
-                            <p className='text-md font-semibold leading-6 text-slate-300'>{title}</p>
                             <section className='flex items-center gap-2 mt-1'>
-                                <p className='truncate text-sm leading-5 text-slate-500'>{subtitle}</p>
+                                <p className='text-md font-semibold leading-6 text-slate-300'>{title}</p>
                                 {tag && (
                                     <>
                                         <svg viewBox='0 0 2 2' className='h-[3px] fill-slate-500'>
                                             <circle cx='1' cy='1' r='1'></circle>
                                         </svg>
-                                        <span className='bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-400 border border-blue-400'>
-                                            {tag}
-                                        </span>
+                                        <Chip label={tag} />
                                     </>
                                 )}
                             </section>
+                            <p className='truncate text-sm leading-5 text-slate-500'>{subtitle}</p>
                         </div>
                     </div>
-                    <div className='mt-4'>{extra && extra}</div>
+                    <section className='flex items-center gap-4'>
+                        <div className='mt-1'>{extra && extra}</div>
+                        <svg
+                            xmlns='http://www.w3.org/2000/svg'
+                            viewBox='0 0 20 20'
+                            fill='currentColor'
+                            aria-hidden='true'
+                            className='w-6 h-6 text-slate-600'>
+                            <path
+                                fill-rule='evenodd'
+                                d='M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z'
+                                clip-rule='evenodd'></path>
+                        </svg>
+                    </section>
                 </li>
             ))}
         </ul>

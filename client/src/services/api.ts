@@ -33,7 +33,7 @@ export const addStreamer = async (streamerData: AddStreamerData): Promise<Stream
 
 export const upvoteStreamer = async (streamerId: string): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/streamers/${streamerId}/vote`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
@@ -44,7 +44,7 @@ export const upvoteStreamer = async (streamerId: string): Promise<void> => {
 
 export const downvoteStreamer = async (streamerId: string): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/streamers/${streamerId}/vote`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
