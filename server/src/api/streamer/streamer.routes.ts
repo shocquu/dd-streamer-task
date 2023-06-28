@@ -12,5 +12,6 @@ router.put('/:streamerId', StreamerController.updateSteamer);
 router.put('/:streamerId/vote', StreamerController.voteForStreamer);
 
 router.delete('/:streamerId', StreamerController.deleteStreamer);
+router.delete('/:streamerId/vote', StreamerController.removeVote);
 
 export default router;

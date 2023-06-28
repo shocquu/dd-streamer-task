@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Form, List, Rating } from '../components';
 import { addStreamer, getStreamers } from '../services/api';
+import { Form, List, Rating } from '../components';
+import { FieldConfig } from '../components/Form';
 import { ListRecord } from '../components/List';
 import { Platform } from '../shared/enums';
-import { FieldConfig } from '../components/Form';
 import MainLayout from './MainLayout';
 
 type StreamerFormValues = {

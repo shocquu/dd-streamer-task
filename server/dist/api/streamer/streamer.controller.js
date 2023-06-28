@@ -98,6 +98,30 @@ const StreamerController = {
             res.status(200).json({ error: `Internal server error: ${error.message}` });
         }
     },
+    removeVote: async ({ params, body }, res) => {
+        try {
+            const streamerId = params.streamerId;
+            const voteType = body.voteType;
+            if (voteType !== enums_1.VoteType.UPVOTE && voteType !== enums_1.VoteType.DOWNVOTE) {
+                res.status(400).json({ error: 'Invalid voteType.' });
+            }
+            const streamer = await streamer_model_1.default.findById(streamerId);
+            if (!streamer) {
+                res.status(404).json({ error: 'Streamer not found' });
+                return;
+            }
+            if (voteType === enums_1.VoteType.UPVOTE)
+                streamer.upvotesCount -= 1;
+            else
+                streamer.downvotesCount -= 1;
+            streamer.totalVotes -= 1;
+            await streamer_model_1.default.updateOne({ _id: streamerId }, streamer);
+            res.status(200).json({ message: 'Vote updated successfully.' });
+        }
+        catch (error) {
+            res.status(200).json({ error: `Internal server error: ${error.message}` });
+        }
+    },
 };
 exports.default = StreamerController;
 //# sourceMappingURL=streamer.controller.js.map

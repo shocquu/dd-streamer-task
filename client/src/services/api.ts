@@ -52,3 +52,25 @@ export const downvoteStreamer = async (streamerId: string): Promise<void> => {
     });
     await handleResponse(response);
 };
+
+export const removeUpvote = async (streamerId: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/streamers/${streamerId}/vote`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ voteType: VoteType.Upvote }),
+    });
+    await handleResponse(response);
+};
+
+export const removeDownvote = async (streamerId: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/streamers/${streamerId}/vote`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ voteType: VoteType.Downvote }),
+    });
+    await handleResponse(response);
+};

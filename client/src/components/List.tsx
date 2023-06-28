@@ -65,7 +65,9 @@ const List = ({ data }: ListProps) => {
                             </div>
                         </div>
                         <section className='flex items-center gap-4'>
-                            <div className='mt-1'>{extra && extra}</div>
+                            <div className='mt-1' onClick={(e) => e.preventDefault()}>
+                                {extra && extra}
+                            </div>
                             <svg
                                 xmlns='http://www.w3.org/2000/svg'
                                 viewBox='0 0 20 20'
@@ -73,9 +75,9 @@ const List = ({ data }: ListProps) => {
                                 aria-hidden='true'
                                 className='w-6 h-6 text-slate-600'>
                                 <path
-                                    fill-rule='evenodd'
+                                    fillRule='evenodd'
                                     d='M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z'
-                                    clip-rule='evenodd'></path>
+                                    clipRule='evenodd'></path>
                             </svg>
                         </section>
                     </Link>
