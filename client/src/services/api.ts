@@ -1,5 +1,5 @@
 import { VoteType } from '../shared/enums';
-import { AddStreamerData, Streamer } from '../shared/types';
+import { AddStreamerData, Pagination, QueryParams, Streamer } from '../shared/types';
 
 const API_BASE_URL = 'http://localhost:3000';
 
@@ -10,8 +10,17 @@ const handleResponse = async (response: Response) => {
     else throw data;
 };
 
-export const getStreamers = async (): Promise<Streamer[]> => {
-    const response = await fetch(`${API_BASE_URL}/streamers`);
+export const getStreamers = async ({ sortBy, sortOrder, page, limit }: QueryParams = {}): Promise<{
+    streamers: Streamer[];
+    pagination: Pagination;
+}> => {
+    const queryParams = new URLSearchParams();
+    if (page) queryParams.set('page', String(page));
+    if (limit) queryParams.set('limit', String(limit));
+    if (sortBy) queryParams.set('sortBy', sortBy);
+    if (sortOrder) queryParams.set('sortOrder', sortOrder);
+
+    const response = await fetch(`${API_BASE_URL}/streamers?${queryParams}`);
     return handleResponse(response);
 };
 

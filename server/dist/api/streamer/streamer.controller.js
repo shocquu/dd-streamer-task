@@ -8,8 +8,24 @@ const enums_1 = require("../../enums");
 const StreamerController = {
     getStreamers: async (req, res) => {
         try {
-            const streamers = await streamer_model_1.default.find();
-            res.status(200).json(streamers);
+            const { page = 1, limit = 10, sortBy = 'name', sortOrder = 'asc' } = req.query;
+            const sortOptions = {};
+            sortOptions[String(sortBy)] = sortOrder === 'desc' ? -1 : 1;
+            const totalStreamers = await streamer_model_1.default.countDocuments();
+            const totalPages = Math.ceil(totalStreamers / +limit);
+            const streamers = await streamer_model_1.default.find()
+                .sort(sortOptions)
+                .skip((+page - 1) * +limit)
+                .limit(+limit);
+            res.status(200).json({
+                streamers,
+                pagination: {
+                    totalStreamers,
+                    totalPages,
+                    currentPage: +page,
+                    limit: +limit,
+                },
+            });
         }
         catch (error) {
             res.status(500).json({ error: `Internal server error: ${error.message}` });

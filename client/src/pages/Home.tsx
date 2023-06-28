@@ -70,18 +70,17 @@ const HomePage = () => {
     useEffect(() => {
         const fetchStreamers = async () => {
             try {
-                const streamers = await getStreamers();
-                const transformedStreamers = streamers
-                    .slice(0)
-                    .reverse()
-                    .map(({ _id, name, description, imageUrl, platform, upvotesCount, downvotesCount }) => ({
+                const { streamers } = await getStreamers({ limit: 10 });
+                const transformedStreamers = streamers.map(
+                    ({ _id, name, description, imageUrl, platform, upvotesCount, downvotesCount }) => ({
                         id: _id,
                         title: name,
                         subtitle: description ?? '',
                         tag: platform,
                         imageUrl,
                         extra: <Rating id={_id} likes={upvotesCount} dislikes={downvotesCount} />,
-                    }));
+                    })
+                );
 
                 setStreamerList(transformedStreamers);
             } catch (error) {

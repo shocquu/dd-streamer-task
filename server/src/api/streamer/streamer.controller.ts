@@ -1,12 +1,31 @@
 import { Request, Response } from 'express';
 import Streamer from './streamer.model';
 import { VoteType } from '../../enums';
+import { SortOrder } from 'mongoose';
 
 const StreamerController = {
     getStreamers: async (req: Request, res: Response): Promise<void> => {
         try {
-            const streamers = await Streamer.find();
-            res.status(200).json(streamers);
+            const { page = 1, limit = 10, sortBy = 'name', sortOrder = 'asc' } = req.query;
+            const sortOptions: Record<string, SortOrder> = {};
+            sortOptions[String(sortBy)] = sortOrder === 'desc' ? -1 : 1;
+
+            const totalStreamers = await Streamer.countDocuments();
+            const totalPages = Math.ceil(totalStreamers / +limit);
+
+            const streamers = await Streamer.find()
+                .sort(sortOptions)
+                .skip((+page - 1) * +limit)
+                .limit(+limit);
+            res.status(200).json({
+                streamers,
+                pagination: {
+                    total: totalStreamers,
+                    totalPages,
+                    currentPage: +page,
+                    limit: +limit,
+                },
+            });
         } catch (error) {
             res.status(500).json({ error: `Internal server error: ${error.message}` });
         }

@@ -15,4 +15,18 @@ export type AddStreamerData = {
     description?: string;
 };
 
+export type QueryParams = {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+};
+
+export type Pagination = {
+    total: number;
+    totalPages: number;
+    currentPage: number;
+    limit: number;
+};
+
 export type VoteType = 'upvote' | 'downvote';
