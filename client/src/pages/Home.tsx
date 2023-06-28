@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { addStreamer, getStreamers } from '../services/api';
-import { Form, List, Rating } from '../components';
+import { Form, Rating, Skeleton } from '../components';
 import { FieldConfig } from '../components/Form';
 import { ListRecord } from '../components/List';
 import { Platform } from '../shared/enums';
-import MainLayout from './MainLayout';
+
+const List = lazy(() => import('../components/List'));
 
 type StreamerFormValues = {
     name: string;
@@ -47,30 +48,38 @@ const formFieldConfig: FieldConfig<StreamerFormValues> = {
 
 const HomePage = () => {
     const [streamerList, setStreamerList] = useState<ListRecord[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (values: StreamerFormValues) => {
-        const addedStreamer = await addStreamer(values);
-        const newListEntry = {
-            id: addedStreamer._id,
-            title: addedStreamer.name,
-            subtitle: addedStreamer.description ?? '',
-            imageUrl: addedStreamer.imageUrl ?? '',
-            tag: addedStreamer.platform,
-            extra: (
-                <Rating
-                    id={addedStreamer._id}
-                    likes={addedStreamer.upvotesCount}
-                    dislikes={addedStreamer.downvotesCount}
-                />
-            ),
-        };
-        setStreamerList((prevList) => [newListEntry, ...prevList]);
+        try {
+            setIsLoading(true);
+            const addedStreamer = await addStreamer(values);
+            const newListEntry = {
+                id: addedStreamer._id,
+                title: addedStreamer.name,
+                subtitle: addedStreamer.description ?? '',
+                imageUrl: addedStreamer.imageUrl ?? '',
+                tag: addedStreamer.platform,
+                extra: (
+                    <Rating
+                        id={addedStreamer._id}
+                        likes={addedStreamer.upvotesCount}
+                        dislikes={addedStreamer.downvotesCount}
+                    />
+                ),
+            };
+            setStreamerList((prevList) => [newListEntry, ...prevList]);
+        } catch (error) {
+            console.error('An error occured: ', error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => {
         const fetchStreamers = async () => {
             try {
-                const { streamers } = await getStreamers({ limit: 10 });
+                const { streamers } = await getStreamers({ limit: 10, sortBy: 'createdAt', sortOrder: 'desc' });
                 const transformedStreamers = streamers.map(
                     ({ _id, name, description, imageUrl, platform, upvotesCount, downvotesCount }) => ({
                         id: _id,
@@ -92,16 +101,19 @@ const HomePage = () => {
     }, []);
 
     return (
-        <MainLayout>
+        <>
             <Form<StreamerFormValues>
                 initialValues={initialValues}
                 fieldConfig={formFieldConfig}
                 onSubmit={handleSubmit}
+                isLoading={isLoading}
             />
             <div className='px-4 py-6 sm:px-0'>
-                <List data={streamerList} />
+                <Suspense fallback={<Skeleton.List />}>
+                    <List data={streamerList} />
+                </Suspense>
             </div>
-        </MainLayout>
+        </>
     );
 };
 

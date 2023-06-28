@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
-import Chip from './Chip';
 import { Link } from 'react-router-dom';
+import Chip from './Chip';
 
 export type ListRecord = {
     id: string;
@@ -21,7 +21,7 @@ const List = ({ data }: ListProps) => {
             {data.map(({ id, title, subtitle, imageUrl, tag, extra }) => (
                 <li key={id}>
                     <Link to={`/streamers/${id}`} className='flex justify-between items-center gap-x-6 py-5'>
-                        <div className='flex gap-x-4'>
+                        <div className='flex gap-x-4 w-[calc(100%-10em)]'>
                             <span className='inline-block h-12 w-12 bg-gray-100 dark:bg-gray-600 rounded-full overflow-hidden'>
                                 {imageUrl ? (
                                     <img
@@ -49,7 +49,7 @@ const List = ({ data }: ListProps) => {
                                     </svg>
                                 )}
                             </span>
-                            <div className='min-w-0 flex-auto'>
+                            <div className='min-w-0 flex-auto w-[calc(100%-15em)]'>
                                 <section className='flex items-center gap-2 mt-1'>
                                     <p className='text-md font-semibold leading-6 text-slate-300'>{title}</p>
                                     {tag && (

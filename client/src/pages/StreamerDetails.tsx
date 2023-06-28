@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getStreamer } from '../services/api';
 import { Streamer } from '../shared/types';
-import MainLayout from './MainLayout';
 import { ThumbDown, ThumbUp } from '../components/icons';
 
 const StreamerDetails = () => {
@@ -28,7 +27,7 @@ const StreamerDetails = () => {
     }, [id]);
 
     return (
-        <MainLayout>
+        <>
             <Link to={'/'} className='flex items-center gap-2 text-slate-300'>
                 <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -66,7 +65,7 @@ const StreamerDetails = () => {
                     </article>
                 </div>
             </section>
-        </MainLayout>
+        </>
     );
 };
 
