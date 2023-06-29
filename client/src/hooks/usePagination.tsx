@@ -8,9 +8,17 @@ type UsePaginationOptions<T> = {
     }>;
     initialLimit?: number;
     initialOffset?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
 };
 
-const usePagination = <T,>({ fetchData, initialLimit = 10, initialOffset = 0 }: UsePaginationOptions<T>) => {
+const usePagination = <T,>({
+    fetchData,
+    sortBy = '_id',
+    sortOrder = 'asc',
+    initialLimit = 10,
+    initialOffset = 0,
+}: UsePaginationOptions<T>) => {
     const [data, setData] = useState<T[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [pagination, setPagination] = useState<Pagination>({
@@ -23,7 +31,7 @@ const usePagination = <T,>({ fetchData, initialLimit = 10, initialOffset = 0 }: 
         setIsLoading(true);
 
         try {
-            const newData = await fetchData({ offset, limit });
+            const newData = await fetchData({ offset, limit, sortBy, sortOrder });
             setPagination(newData.pagination);
             setData((prevData) => [...prevData, ...newData.data]);
         } catch (error) {
@@ -43,9 +51,6 @@ const usePagination = <T,>({ fetchData, initialLimit = 10, initialOffset = 0 }: 
 
     useEffect(() => {
         fetchDataAndSetData(initialOffset, initialLimit);
-        // return () => {
-        //     fetchDataAndSetData(initialOffset, initialLimit);
-        // };
     }, []);
 
     return { data, ...pagination, isLoading, loadMore };

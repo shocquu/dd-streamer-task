@@ -17,7 +17,7 @@ const MainLayout = () => {
                     <Outlet />
                 </Suspense>
             </main>
-            <footer className={'fixed inset-x-0 bottom-0 bg-gray-200 dark:bg-gray-950 py-2'}>
+            <footer className={'inset-x-0 bottom-0 bg-gray-200 dark:bg-gray-950 py-2'}>
                 <div className='max-w-4xl mx-auto px-6 text-center'>
                     <p className={'text-gray-800 dark:text-slate-500 text-sm'}>Dare Drop</p>
                 </div>

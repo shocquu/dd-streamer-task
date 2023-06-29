@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
+const enums_1 = require("../../enums");
 const streamerSchema = new mongoose_1.Schema({
     name: {
         type: String,
@@ -11,10 +12,24 @@ const streamerSchema = new mongoose_1.Schema({
         required: true,
     },
     imageUrl: String,
+    votes: [
+        {
+            userId: {
+                type: String,
+                required: true,
+            },
+            voteType: {
+                type: String,
+                enum: enums_1.VoteType,
+                required: true,
+            },
+            timestamp: {
+                type: Date,
+                default: Date.now,
+            },
+        },
+    ],
     description: { type: String, default: '' },
-    upvotesCount: { type: Number, default: 0 },
-    downvotesCount: { type: Number, default: 0 },
-    totalVotes: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now },
 });
 const Streamer = (0, mongoose_1.model)('Streamer', streamerSchema);

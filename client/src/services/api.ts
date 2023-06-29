@@ -41,45 +41,25 @@ export const addStreamer = async (streamerData: AddStreamerData): Promise<Stream
 };
 
 export const upvoteStreamer = async (streamerId: string): Promise<void> => {
+    const userId = localStorage.getItem('userId');
     const response = await fetch(`${API_BASE_URL}/streamers/${streamerId}/vote`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ voteType: VoteType.Upvote }),
+        body: JSON.stringify({ userId, voteType: VoteType.Upvote }),
     });
     await handleResponse(response);
 };
 
 export const downvoteStreamer = async (streamerId: string): Promise<void> => {
+    const userId = localStorage.getItem('userId');
     const response = await fetch(`${API_BASE_URL}/streamers/${streamerId}/vote`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ voteType: VoteType.Downvote }),
-    });
-    await handleResponse(response);
-};
-
-export const removeUpvote = async (streamerId: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/streamers/${streamerId}/vote`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ voteType: VoteType.Upvote }),
-    });
-    await handleResponse(response);
-};
-
-export const removeDownvote = async (streamerId: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/streamers/${streamerId}/vote`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ voteType: VoteType.Downvote }),
+        body: JSON.stringify({ userId, voteType: VoteType.Downvote }),
     });
     await handleResponse(response);
 };

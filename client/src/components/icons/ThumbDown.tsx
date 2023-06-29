@@ -4,7 +4,7 @@ type ThumbDownProps = {
 };
 
 const ThumbDown = ({ size, color }: ThumbDownProps) => {
-    const sizeClass = size ? `w-[${size}] h-${size}` : 'w-6 h-6';
+    const sizeClass = size ? `w-[${size}] h-${size}` : 'w-5 h-5';
 
     return (
         <svg
@@ -24,7 +24,7 @@ const ThumbDown = ({ size, color }: ThumbDownProps) => {
 };
 
 ThumbDown.Solid = ({ size, color }: ThumbDownProps) => {
-    const sizeClass = size ? `w-${size} h-${size}` : 'w-6 h-6';
+    const sizeClass = size ? `w-${size} h-${size}` : 'w-5 h-5';
 
     return (
         <svg

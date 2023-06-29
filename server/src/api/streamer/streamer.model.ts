@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose';
 import Streamer from './streamer.interface';
+import { VoteType } from '../../enums';
 
 const streamerSchema = new Schema<Streamer>({
     name: {
@@ -11,10 +12,24 @@ const streamerSchema = new Schema<Streamer>({
         required: true,
     },
     imageUrl: String,
+    votes: [
+        {
+            userId: {
+                type: String,
+                required: true,
+            },
+            voteType: {
+                type: String,
+                enum: VoteType,
+                required: true,
+            },
+            timestamp: {
+                type: Date,
+                default: Date.now,
+            },
+        },
+    ],
     description: { type: String, default: '' },
-    upvotesCount: { type: Number, default: 0 },
-    downvotesCount: { type: Number, default: 0 },
-    totalVotes: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now },
 });
 

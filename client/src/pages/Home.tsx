@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { addStreamer, getStreamers } from '../services/api';
 import { Form, Rating, Skeleton } from '../components';
 import { FieldConfig } from '../components/Form';
@@ -48,24 +49,17 @@ const formFieldConfig: FieldConfig<StreamerFormValues> = {
     },
 };
 
-const transformToList = (data: Streamer[]) =>
-    data.map(({ _id, name, description, imageUrl, platform, upvotesCount, downvotesCount }) => ({
-        id: _id,
-        title: name,
-        subtitle: description ?? '',
-        tag: platform,
-        imageUrl,
-        extra: <Rating id={_id} likes={upvotesCount} dislikes={downvotesCount} />,
-    }));
-
 const HomePage = () => {
     const [streamerList, setStreamerList] = useState<ListRecord[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [userId, setUserId] = useState('');
 
     const { data, total, loadMore } = usePagination<Streamer>({
         fetchData: getStreamers,
         initialOffset: 0,
-        initialLimit: 5,
+        initialLimit: 10,
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
     });
 
     const handleSubmit = async (values: StreamerFormValues) => {
@@ -76,16 +70,11 @@ const HomePage = () => {
                 id: addedStreamer._id,
                 title: addedStreamer.name,
                 subtitle: addedStreamer.description ?? '',
-                imageUrl: addedStreamer.imageUrl ?? '',
+                imageUrl: addedStreamer.imageUrl,
                 tag: addedStreamer.platform,
-                extra: (
-                    <Rating
-                        id={addedStreamer._id}
-                        likes={addedStreamer.upvotesCount}
-                        dislikes={addedStreamer.downvotesCount}
-                    />
-                ),
+                extra: <Rating id={addedStreamer._id} likes={0} dislikes={0} />,
             };
+            console.log(addedStreamer);
             setStreamerList((prevList) => [newListEntry, ...prevList]);
         } catch (error) {
             console.error('An error occured: ', error);
@@ -96,18 +85,38 @@ const HomePage = () => {
 
     useEffect(() => {
         if (!data) return;
+
         const transformed = data.map(
-            ({ _id, name, description, imageUrl, platform, upvotesCount, downvotesCount }) => ({
+            ({ _id, name, description, imageUrl, platform, upvoted, downvoted, statistics }) => ({
                 id: _id,
                 title: name,
                 subtitle: description ?? '',
                 tag: platform,
                 imageUrl,
-                extra: <Rating id={_id} likes={upvotesCount} dislikes={downvotesCount} />,
+                extra: (
+                    <Rating
+                        id={_id}
+                        likes={statistics.upvotesCount}
+                        dislikes={statistics.downvotesCount}
+                        hasUpvoted={upvoted.includes(userId)}
+                        hasDownvoted={downvoted.includes(userId)}
+                    />
+                ),
             })
         );
         setStreamerList(transformed);
-    }, [data]);
+    }, [data, userId]);
+
+    useEffect(() => {
+        let uuid = localStorage.getItem('userId') ?? '';
+
+        if (!uuid) {
+            uuid = uuidv4();
+            localStorage.setItem('userId', uuid);
+        }
+
+        setUserId(uuid);
+    }, []);
 
     return (
         <>

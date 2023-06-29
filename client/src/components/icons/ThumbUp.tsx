@@ -4,7 +4,7 @@ type ThumbUpProps = {
 };
 
 const ThumbUp = ({ size, color }: ThumbUpProps) => {
-    const sizeClass = size ? `w-${size} h-${size}` : 'w-6 h-6';
+    const sizeClass = size ? `w-${size} h-${size}` : 'w-5 h-5';
 
     return (
         <svg
@@ -24,7 +24,7 @@ const ThumbUp = ({ size, color }: ThumbUpProps) => {
 };
 
 ThumbUp.Solid = ({ size, color }: ThumbUpProps) => {
-    const sizeClass = size ? `w-${size} h-${size}` : 'w-6 h-6';
+    const sizeClass = size ? `w-${size} h-${size}` : 'w-5 h-5';
 
     return (
         <svg

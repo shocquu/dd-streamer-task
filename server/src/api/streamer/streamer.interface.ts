@@ -1,13 +1,16 @@
-import { Document } from 'mongoose';
-import { Platform } from '../../enums';
+import { Platform, VoteType } from '../../enums';
 
-interface Streamer extends Document {
+interface Vote {
+    userId: string;
+    voteType: VoteType;
+    timestamp?: Date;
+}
+
+interface Streamer {
     name: string;
     description: string;
     platform: Platform;
-    upvotesCount?: number;
-    downvotesCount?: number;
-    totalVotes?: number;
+    votes: Vote[];
     imageUrl?: string;
     createdAt: Date;
 }

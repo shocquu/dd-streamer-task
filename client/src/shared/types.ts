@@ -1,11 +1,23 @@
+import { VoteType } from './enums';
+
+export type Vote = {
+    userId: string;
+    voteType: VoteType;
+    timestamp: Date;
+};
+
 export type Streamer = {
     _id: string;
     name: string;
     platform: string;
     imageUrl?: string;
     description?: string;
-    upvotesCount: number;
-    downvotesCount: number;
+    upvoted: string[];
+    downvoted: string[];
+    statistics: {
+        upvotesCount: number;
+        downvotesCount: number;
+    };
 };
 
 export type AddStreamerData = {
@@ -27,5 +39,3 @@ export type Pagination = {
     total: number;
     offset: number;
 };
-
-export type VoteType = 'upvote' | 'downvote';

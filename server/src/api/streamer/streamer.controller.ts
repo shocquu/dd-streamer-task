@@ -1,18 +1,78 @@
 import { Request, Response } from 'express';
 import Streamer from './streamer.model';
 import { VoteType } from '../../enums';
-import { SortOrder } from 'mongoose';
+import { Types } from 'mongoose';
 
 const StreamerController = {
     getStreamers: async (req: Request, res: Response): Promise<void> => {
         try {
             const { offset = 0, limit = 10, sortBy = 'name', sortOrder = 'asc' } = req.query;
-            const sortOptions: Record<string, SortOrder> = {};
+            const sortOptions: any = {}; // FIXME: any
             sortOptions[String(sortBy)] = sortOrder === 'desc' ? -1 : 1;
 
             const totalStreamers = await Streamer.countDocuments();
+            const streamers = await Streamer.aggregate([
+                { $sort: sortOptions },
+                { $skip: +offset },
+                { $limit: +limit },
+                {
+                    $project: {
+                        _id: 1,
+                        name: 1,
+                        platform: 1,
+                        imageUrl: 1,
+                        description: 1,
+                        createdAt: 1,
+                        upvoted: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'upvote'] },
+                                    },
+                                },
+                                as: 'vote',
+                                in: '$$vote.userId',
+                            },
+                        },
+                        downvoted: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'downvote'] },
+                                    },
+                                },
+                                as: 'vote',
+                                in: '$$vote.userId',
+                            },
+                        },
+                        statistics: {
+                            upvotesCount: {
+                                $size: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'upvote'] },
+                                    },
+                                },
+                            },
+                            downvotesCount: {
+                                $size: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'downvote'] },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            ]);
 
-            const streamers = await Streamer.find().sort(sortOptions).skip(+offset).limit(+limit);
             res.status(200).json({
                 data: streamers,
                 pagination: {
@@ -28,9 +88,67 @@ const StreamerController = {
 
     getStreamerById: async ({ params: { streamerId } }: Request, res: Response): Promise<void> => {
         try {
-            const streamer = await Streamer.findById(streamerId);
+            const streamer = await Streamer.aggregate([
+                { $match: { _id: new Types.ObjectId(streamerId) } },
+                {
+                    $project: {
+                        _id: 1,
+                        name: 1,
+                        platform: 1,
+                        imageUrl: 1,
+                        description: 1,
+                        createdAt: 1,
+                        upvoted: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'upvote'] },
+                                    },
+                                },
+                                as: 'vote',
+                                in: '$$vote.userId',
+                            },
+                        },
+                        downvoted: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'downvote'] },
+                                    },
+                                },
+                                as: 'vote',
+                                in: '$$vote.userId',
+                            },
+                        },
+                        statistics: {
+                            upvotesCount: {
+                                $size: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'upvote'] },
+                                    },
+                                },
+                            },
+                            downvotesCount: {
+                                $size: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'downvote'] },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            ]);
 
-            if (streamer) res.status(200).json(streamer);
+            if (streamer) res.status(200).json(streamer[0]);
             else res.status(404).json({ error: 'Streamer not found' });
         } catch (error) {
             res.status(500).json({ error: `Internal server error: ${error.message}` });
@@ -74,73 +192,45 @@ const StreamerController = {
         }
     },
 
-    deleteStreamer: async ({ params: { streamerId } }: Request, res: Response): Promise<void> => {
+    deleteStreamer: async ({ params: { streamerId } }: Request, res: Response) => {
         try {
             const deletedStreamer = await Streamer.findByIdAndDelete(streamerId);
 
             if (deletedStreamer) {
-                res.status(200).json({ message: 'Streamer deleted successfully' });
+                return res.status(200).json({ message: 'Streamer deleted successfully' });
             } else {
-                res.status(404).json({ error: 'Streamer not found' });
+                return res.status(404).json({ error: 'Streamer not found' });
             }
         } catch (error) {
-            res.status(500).json({ error: `Internal server error: ${error.message}` });
+            return res.status(500).json({ error: `Internal server error: ${error.message}` });
         }
     },
 
-    voteForStreamer: async ({ params, body }: Request, res: Response): Promise<void> => {
+    voteForStreamer: async ({ params, body }: Request, res: Response) => {
         try {
             const streamerId = params.streamerId;
-            const voteType = body.voteType as VoteType;
+            const { voteType, userId } = body;
 
-            if (voteType !== VoteType.UPVOTE && voteType !== VoteType.DOWNVOTE) {
-                res.status(400).json({ error: 'Invalid voteType.' });
-            }
+            if (voteType !== VoteType.UPVOTE && voteType !== VoteType.DOWNVOTE)
+                return res.status(400).json({ error: 'Invalid voteType.' });
+            if (!userId) return res.status(400).json({ error: 'Invalid userId.' });
 
             const streamer = await Streamer.findById(streamerId);
 
-            if (!streamer) {
-                res.status(404).json({ error: 'Streamer not found' });
-                return;
-            }
+            if (!streamer) return res.status(404).json({ error: 'Streamer not found' });
 
-            if (voteType === VoteType.UPVOTE) streamer.upvotesCount += 1;
-            else streamer.downvotesCount += 1;
+            const existingVote = streamer.votes.find((vote) => vote.userId === userId);
 
-            streamer.totalVotes += 1;
-
-            await Streamer.updateOne({ _id: streamerId }, streamer);
-            res.status(200).json({ message: 'Vote updated successfully.' });
-        } catch (error) {
-            res.status(200).json({ error: `Internal server error: ${error.message}` });
-        }
-    },
-
-    removeVote: async ({ params, body }: Request, res: Response): Promise<void> => {
-        try {
-            const streamerId = params.streamerId;
-            const voteType = body.voteType as VoteType;
-
-            if (voteType !== VoteType.UPVOTE && voteType !== VoteType.DOWNVOTE) {
-                res.status(400).json({ error: 'Invalid voteType.' });
-            }
-
-            const streamer = await Streamer.findById(streamerId);
-
-            if (!streamer) {
-                res.status(404).json({ error: 'Streamer not found' });
-                return;
-            }
-
-            if (voteType === VoteType.UPVOTE) streamer.upvotesCount -= 1;
-            else streamer.downvotesCount -= 1;
-
-            streamer.totalVotes -= 1;
+            if (existingVote) {
+                if (existingVote.voteType === voteType)
+                    streamer.votes = streamer.votes.filter((vote) => vote.userId != existingVote.userId);
+                else existingVote.voteType = voteType;
+            } else streamer.votes.push({ userId, voteType });
 
             await Streamer.updateOne({ _id: streamerId }, streamer);
-            res.status(200).json({ message: 'Vote updated successfully.' });
+            return res.status(200).json({ message: 'Vote updated successfully.' });
         } catch (error) {
-            res.status(200).json({ error: `Internal server error: ${error.message}` });
+            return res.status(200).json({ error: `Internal server error: ${error.message}` });
         }
     },
 };

@@ -5,14 +5,75 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const streamer_model_1 = __importDefault(require("./streamer.model"));
 const enums_1 = require("../../enums");
+const mongoose_1 = require("mongoose");
 const StreamerController = {
     getStreamers: async (req, res) => {
         try {
             const { offset = 0, limit = 10, sortBy = 'name', sortOrder = 'asc' } = req.query;
-            const sortOptions = {};
+            const sortOptions = {}; // FIXME: any
             sortOptions[String(sortBy)] = sortOrder === 'desc' ? -1 : 1;
             const totalStreamers = await streamer_model_1.default.countDocuments();
-            const streamers = await streamer_model_1.default.find().sort(sortOptions).skip(+offset).limit(+limit);
+            const streamers = await streamer_model_1.default.aggregate([
+                { $sort: sortOptions },
+                { $skip: +offset },
+                { $limit: +limit },
+                {
+                    $project: {
+                        _id: 1,
+                        name: 1,
+                        platform: 1,
+                        imageUrl: 1,
+                        description: 1,
+                        createdAt: 1,
+                        upvoted: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'upvote'] },
+                                    },
+                                },
+                                as: 'vote',
+                                in: '$$vote.userId',
+                            },
+                        },
+                        downvoted: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'downvote'] },
+                                    },
+                                },
+                                as: 'vote',
+                                in: '$$vote.userId',
+                            },
+                        },
+                        statistics: {
+                            upvotesCount: {
+                                $size: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'upvote'] },
+                                    },
+                                },
+                            },
+                            downvotesCount: {
+                                $size: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'downvote'] },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            ]);
             res.status(200).json({
                 data: streamers,
                 pagination: {
@@ -28,9 +89,67 @@ const StreamerController = {
     },
     getStreamerById: async ({ params: { streamerId } }, res) => {
         try {
-            const streamer = await streamer_model_1.default.findById(streamerId);
+            const streamer = await streamer_model_1.default.aggregate([
+                { $match: { _id: new mongoose_1.Types.ObjectId(streamerId) } },
+                {
+                    $project: {
+                        _id: 1,
+                        name: 1,
+                        platform: 1,
+                        imageUrl: 1,
+                        description: 1,
+                        createdAt: 1,
+                        upvoted: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'upvote'] },
+                                    },
+                                },
+                                as: 'vote',
+                                in: '$$vote.userId',
+                            },
+                        },
+                        downvoted: {
+                            $map: {
+                                input: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'downvote'] },
+                                    },
+                                },
+                                as: 'vote',
+                                in: '$$vote.userId',
+                            },
+                        },
+                        statistics: {
+                            upvotesCount: {
+                                $size: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'upvote'] },
+                                    },
+                                },
+                            },
+                            downvotesCount: {
+                                $size: {
+                                    $filter: {
+                                        input: '$votes',
+                                        as: 'vote',
+                                        cond: { $eq: ['$$vote.voteType', 'downvote'] },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            ]);
             if (streamer)
-                res.status(200).json(streamer);
+                res.status(200).json(streamer[0]);
             else
                 res.status(404).json({ error: 'Streamer not found' });
         }
@@ -75,62 +194,41 @@ const StreamerController = {
         try {
             const deletedStreamer = await streamer_model_1.default.findByIdAndDelete(streamerId);
             if (deletedStreamer) {
-                res.status(200).json({ message: 'Streamer deleted successfully' });
+                return res.status(200).json({ message: 'Streamer deleted successfully' });
             }
             else {
-                res.status(404).json({ error: 'Streamer not found' });
+                return res.status(404).json({ error: 'Streamer not found' });
             }
         }
         catch (error) {
-            res.status(500).json({ error: `Internal server error: ${error.message}` });
+            return res.status(500).json({ error: `Internal server error: ${error.message}` });
         }
     },
     voteForStreamer: async ({ params, body }, res) => {
         try {
             const streamerId = params.streamerId;
-            const voteType = body.voteType;
-            if (voteType !== enums_1.VoteType.UPVOTE && voteType !== enums_1.VoteType.DOWNVOTE) {
-                res.status(400).json({ error: 'Invalid voteType.' });
-            }
+            const { voteType, userId } = body;
+            if (voteType !== enums_1.VoteType.UPVOTE && voteType !== enums_1.VoteType.DOWNVOTE)
+                return res.status(400).json({ error: 'Invalid voteType.' });
+            if (!userId)
+                return res.status(400).json({ error: 'Invalid userId.' });
             const streamer = await streamer_model_1.default.findById(streamerId);
-            if (!streamer) {
-                res.status(404).json({ error: 'Streamer not found' });
-                return;
+            if (!streamer)
+                return res.status(404).json({ error: 'Streamer not found' });
+            const existingVote = streamer.votes.find((vote) => vote.userId === userId);
+            if (existingVote) {
+                if (existingVote.voteType === voteType)
+                    streamer.votes = streamer.votes.filter((vote) => vote.userId != existingVote.userId);
+                else
+                    existingVote.voteType = voteType;
             }
-            if (voteType === enums_1.VoteType.UPVOTE)
-                streamer.upvotesCount += 1;
             else
-                streamer.downvotesCount += 1;
-            streamer.totalVotes += 1;
+                streamer.votes.push({ userId, voteType });
             await streamer_model_1.default.updateOne({ _id: streamerId }, streamer);
-            res.status(200).json({ message: 'Vote updated successfully.' });
+            return res.status(200).json({ message: 'Vote updated successfully.' });
         }
         catch (error) {
-            res.status(200).json({ error: `Internal server error: ${error.message}` });
-        }
-    },
-    removeVote: async ({ params, body }, res) => {
-        try {
-            const streamerId = params.streamerId;
-            const voteType = body.voteType;
-            if (voteType !== enums_1.VoteType.UPVOTE && voteType !== enums_1.VoteType.DOWNVOTE) {
-                res.status(400).json({ error: 'Invalid voteType.' });
-            }
-            const streamer = await streamer_model_1.default.findById(streamerId);
-            if (!streamer) {
-                res.status(404).json({ error: 'Streamer not found' });
-                return;
-            }
-            if (voteType === enums_1.VoteType.UPVOTE)
-                streamer.upvotesCount -= 1;
-            else
-                streamer.downvotesCount -= 1;
-            streamer.totalVotes -= 1;
-            await streamer_model_1.default.updateOne({ _id: streamerId }, streamer);
-            res.status(200).json({ message: 'Vote updated successfully.' });
-        }
-        catch (error) {
-            res.status(200).json({ error: `Internal server error: ${error.message}` });
+            return res.status(200).json({ error: `Internal server error: ${error.message}` });
         }
     },
 };

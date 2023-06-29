@@ -10,8 +10,12 @@ const StreamerDetails = () => {
         name: '',
         platform: '',
         description: '',
-        upvotesCount: 0,
-        downvotesCount: 0,
+        upvoted: [],
+        downvoted: [],
+        statistics: {
+            upvotesCount: 0,
+            downvotesCount: 0,
+        },
     });
     const { id } = useParams();
 
@@ -46,8 +50,8 @@ const StreamerDetails = () => {
                     <article className='flex flex-col items-center'>
                         <div className='flex justify-between gap-8'>
                             <div className='w-15 mt-4 flex flex-col items-center font-bold text-blue-600 dark:text-blue-300'>
-                                <ThumbUp.Solid />
-                                {details?.upvotesCount}
+                                <ThumbUp.Solid size={6} />
+                                {details?.statistics?.upvotesCount}
                             </div>
                             {details?.imageUrl ? (
                                 <img
@@ -76,18 +80,18 @@ const StreamerDetails = () => {
                             )}
 
                             <div className='w-15 mt-4 flex flex-col items-center font-bold text-red-600 dark:text-red-300'>
-                                <ThumbDown.Solid />
-                                {details?.downvotesCount}
+                                <ThumbDown.Solid size={6} />
+                                {details?.statistics?.downvotesCount}
                             </div>
                         </div>
                         <h1 className='text-2xl font-extrabold text-slate-800 dark:text-slate-300 mt-2'>
-                            {details?.name}
+                            {details.name}
                         </h1>
                         <h2 className='text-md font-bold text-slate-600 dark:text-slate-500 mt-1'>
-                            {details?.platform}
+                            {details.platform}
                         </h2>
                         <p className='my-4 mb-8 text-md text-gray-600 dark:text-gray-500 text-center'>
-                            {details?.description}
+                            {details.description}
                         </p>
                     </article>
                 </div>
