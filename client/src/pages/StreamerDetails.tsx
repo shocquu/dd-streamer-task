@@ -90,7 +90,7 @@ const StreamerDetails = () => {
                         <h2 className='text-md font-bold text-slate-600 dark:text-slate-500 mt-1'>
                             {details.platform}
                         </h2>
-                        <p className='my-4 mb-8 text-md text-gray-600 dark:text-gray-500 text-center'>
+                        <p className='mx-10 my-4 mb-8 text-md text-gray-600 dark:text-gray-500 text-center'>
                             {details.description}
                         </p>
                     </article>
