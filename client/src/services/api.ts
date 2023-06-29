@@ -10,13 +10,13 @@ const handleResponse = async (response: Response) => {
     else throw data;
 };
 
-export const getStreamers = async ({ sortBy, sortOrder, page, limit }: QueryParams = {}): Promise<{
-    streamers: Streamer[];
+export const getStreamers = async ({ sortBy, sortOrder, offset, limit }: QueryParams = {}): Promise<{
+    data: Streamer[];
     pagination: Pagination;
 }> => {
     const queryParams = new URLSearchParams();
-    if (page) queryParams.set('page', String(page));
     if (limit) queryParams.set('limit', String(limit));
+    if (offset) queryParams.set('offset', String(offset));
     if (sortBy) queryParams.set('sortBy', sortBy);
     if (sortOrder) queryParams.set('sortOrder', sortOrder);
 

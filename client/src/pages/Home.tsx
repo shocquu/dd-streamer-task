@@ -4,6 +4,8 @@ import { Form, Rating, Skeleton } from '../components';
 import { FieldConfig } from '../components/Form';
 import { ListRecord } from '../components/List';
 import { Platform } from '../shared/enums';
+import usePagination from '../hooks/usePagination';
+import { Streamer } from '../shared/types';
 
 const List = lazy(() => import('../components/List'));
 
@@ -46,9 +48,25 @@ const formFieldConfig: FieldConfig<StreamerFormValues> = {
     },
 };
 
+const transformToList = (data: Streamer[]) =>
+    data.map(({ _id, name, description, imageUrl, platform, upvotesCount, downvotesCount }) => ({
+        id: _id,
+        title: name,
+        subtitle: description ?? '',
+        tag: platform,
+        imageUrl,
+        extra: <Rating id={_id} likes={upvotesCount} dislikes={downvotesCount} />,
+    }));
+
 const HomePage = () => {
     const [streamerList, setStreamerList] = useState<ListRecord[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+
+    const { data, total, loadMore } = usePagination<Streamer>({
+        fetchData: getStreamers,
+        initialOffset: 0,
+        initialLimit: 5,
+    });
 
     const handleSubmit = async (values: StreamerFormValues) => {
         try {
@@ -77,40 +95,39 @@ const HomePage = () => {
     };
 
     useEffect(() => {
-        const fetchStreamers = async () => {
-            try {
-                const { streamers } = await getStreamers({ limit: 10, sortBy: 'createdAt', sortOrder: 'desc' });
-                const transformedStreamers = streamers.map(
-                    ({ _id, name, description, imageUrl, platform, upvotesCount, downvotesCount }) => ({
-                        id: _id,
-                        title: name,
-                        subtitle: description ?? '',
-                        tag: platform,
-                        imageUrl,
-                        extra: <Rating id={_id} likes={upvotesCount} dislikes={downvotesCount} />,
-                    })
-                );
-
-                setStreamerList(transformedStreamers);
-            } catch (error) {
-                console.error('Failed to fetch data: ', error);
-            }
-        };
-
-        fetchStreamers();
-    }, []);
+        if (!data) return;
+        const transformed = data.map(
+            ({ _id, name, description, imageUrl, platform, upvotesCount, downvotesCount }) => ({
+                id: _id,
+                title: name,
+                subtitle: description ?? '',
+                tag: platform,
+                imageUrl,
+                extra: <Rating id={_id} likes={upvotesCount} dislikes={downvotesCount} />,
+            })
+        );
+        setStreamerList(transformed);
+    }, [data]);
 
     return (
         <>
             <Form<StreamerFormValues>
                 initialValues={initialValues}
                 fieldConfig={formFieldConfig}
-                onSubmit={handleSubmit}
                 isLoading={isLoading}
+                onSubmit={handleSubmit}
             />
             <div className='px-4 py-6 sm:px-0'>
                 <Suspense fallback={<Skeleton.List />}>
                     <List data={streamerList} />
+                    {streamerList.length < total && (
+                        <button
+                            type='button'
+                            className='block mx-auto text-xs text-slate-700 hover:text-white border border-slate-700 hover:bg-slate-800 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-5 py-2.5 text-center mb-2 dark:border-slate-400 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 dark:focus:ring-slate-700'
+                            onClick={loadMore}>
+                            Load
+                        </button>
+                    )}
                 </Suspense>
             </div>
         </>

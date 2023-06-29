@@ -16,17 +16,16 @@ export type AddStreamerData = {
 };
 
 export type QueryParams = {
-    page?: number;
     limit?: number;
+    offset?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
 };
 
 export type Pagination = {
-    total: number;
-    totalPages: number;
-    currentPage: number;
     limit: number;
+    total: number;
+    offset: number;
 };
 
 export type VoteType = 'upvote' | 'downvote';

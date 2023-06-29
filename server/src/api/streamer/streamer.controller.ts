@@ -6,23 +6,18 @@ import { SortOrder } from 'mongoose';
 const StreamerController = {
     getStreamers: async (req: Request, res: Response): Promise<void> => {
         try {
-            const { page = 1, limit = 10, sortBy = 'name', sortOrder = 'asc' } = req.query;
+            const { offset = 0, limit = 10, sortBy = 'name', sortOrder = 'asc' } = req.query;
             const sortOptions: Record<string, SortOrder> = {};
             sortOptions[String(sortBy)] = sortOrder === 'desc' ? -1 : 1;
 
             const totalStreamers = await Streamer.countDocuments();
-            const totalPages = Math.ceil(totalStreamers / +limit);
 
-            const streamers = await Streamer.find()
-                .sort(sortOptions)
-                .skip((+page - 1) * +limit)
-                .limit(+limit);
+            const streamers = await Streamer.find().sort(sortOptions).skip(+offset).limit(+limit);
             res.status(200).json({
-                streamers,
+                data: streamers,
                 pagination: {
                     total: totalStreamers,
-                    totalPages,
-                    currentPage: +page,
+                    offset: +offset,
                     limit: +limit,
                 },
             });

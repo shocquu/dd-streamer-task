@@ -8,21 +8,16 @@ const enums_1 = require("../../enums");
 const StreamerController = {
     getStreamers: async (req, res) => {
         try {
-            const { page = 1, limit = 10, sortBy = 'name', sortOrder = 'asc' } = req.query;
+            const { offset = 0, limit = 10, sortBy = 'name', sortOrder = 'asc' } = req.query;
             const sortOptions = {};
             sortOptions[String(sortBy)] = sortOrder === 'desc' ? -1 : 1;
             const totalStreamers = await streamer_model_1.default.countDocuments();
-            const totalPages = Math.ceil(totalStreamers / +limit);
-            const streamers = await streamer_model_1.default.find()
-                .sort(sortOptions)
-                .skip((+page - 1) * +limit)
-                .limit(+limit);
+            const streamers = await streamer_model_1.default.find().sort(sortOptions).skip(+offset).limit(+limit);
             res.status(200).json({
-                streamers,
+                data: streamers,
                 pagination: {
-                    totalStreamers,
-                    totalPages,
-                    currentPage: +page,
+                    total: totalStreamers,
+                    offset: +offset,
                     limit: +limit,
                 },
             });
