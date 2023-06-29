@@ -26,7 +26,7 @@ const Chip = ({ label }: ChipProps) => {
         <span
             className={`${getPlatformColor(
                 label
-            )} bg-gray-900 text-blue-800 opacity-80 text-xs font-medium mr-2 px-2.5 py-0.5 rounded border`}>
+            )} bg-white dark:bg-gray-900 text-blue-800 opacity-80 text-xs font-medium mr-2 px-2.5 py-0.5 rounded border`}>
             {label}
         </span>
     );

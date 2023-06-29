@@ -17,7 +17,7 @@ type ListProps = {
 
 const List = ({ data }: ListProps) => {
     return (
-        <ul role='list' className='divide-y divide-gray-100 dark:divide-gray-800'>
+        <ul role='list' className='divide-y divide-slate-300 dark:divide-gray-800'>
             {data.map(({ id, title, subtitle, imageUrl, tag, extra }) => (
                 <li key={id}>
                     <Link to={`/streamers/${id}`} className='flex justify-between items-center gap-x-6 py-5'>
@@ -31,7 +31,7 @@ const List = ({ data }: ListProps) => {
                                     />
                                 ) : (
                                     <svg
-                                        className='h-full w-full text-gray-300 dark:text-gray-700 fill-white dark:fill-gray-500'
+                                        className='h-full w-full text-gray-300 dark:text-gray-700 fill-white dark:fill-gray-500 border rounded-full border-slate-300 dark:border-slate-800'
                                         width='16'
                                         height='16'
                                         viewBox='0 0 16 16'
@@ -51,7 +51,9 @@ const List = ({ data }: ListProps) => {
                             </span>
                             <div className='min-w-0 flex-auto w-[calc(100%-15em)]'>
                                 <section className='flex items-center gap-2 mt-1'>
-                                    <p className='text-md font-semibold leading-6 text-slate-300'>{title}</p>
+                                    <p className='text-md font-semibold leading-6 text-slate-800 dark:text-slate-300'>
+                                        {title}
+                                    </p>
                                     {tag && (
                                         <>
                                             <svg viewBox='0 0 2 2' className='h-[3px] fill-slate-500'>
@@ -61,7 +63,9 @@ const List = ({ data }: ListProps) => {
                                         </>
                                     )}
                                 </section>
-                                <p className='truncate text-sm leading-5 text-slate-500'>{subtitle}</p>
+                                <p className='truncate text-sm leading-5 text-slate-700 dark:text-slate-500'>
+                                    {subtitle}
+                                </p>
                             </div>
                         </div>
                         <section className='flex items-center gap-4'>
@@ -73,7 +77,7 @@ const List = ({ data }: ListProps) => {
                                 viewBox='0 0 20 20'
                                 fill='currentColor'
                                 aria-hidden='true'
-                                className='w-6 h-6 text-slate-600'>
+                                className='w-6 h-6 text-slate-800 dark:text-slate-600'>
                                 <path
                                     fillRule='evenodd'
                                     d='M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z'

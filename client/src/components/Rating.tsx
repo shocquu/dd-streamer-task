@@ -47,13 +47,13 @@ const Rating = ({ id, likes = 0, dislikes = 0 }: RatingProps) => {
 
     const UpvoteButton =
         submittedVotes[id] === VoteType.Upvote ? (
-            <button className='flex items-center text-blue-300' onClick={handleRemoveUpvote}>
+            <button className='flex items-center text-blue-600 dark:text-blue-300' onClick={handleRemoveUpvote}>
                 <ThumbUp.Solid size={5} />
                 <p className='ml-2 text-xs font-bold'>{formatNumber(localLikes)}</p>
             </button>
         ) : (
             <button
-                className='flex items-center text-gray-900 dark:text-slate-300 hover:text-white'
+                className='flex items-center text-slate-700 dark:text-slate-300 hover:text-white'
                 onClick={handleUpvote}>
                 <ThumbUp size={5} />
                 <p className='ml-2 text-xs font-bold'>{formatNumber(localLikes)}</p>
@@ -62,13 +62,13 @@ const Rating = ({ id, likes = 0, dislikes = 0 }: RatingProps) => {
 
     const DownvoteButton =
         submittedVotes[id] === VoteType.Downvote ? (
-            <button className='flex items-center text-red-300' onClick={handleRemoveDownvote}>
+            <button className='flex items-center text-red-600 dark:text-red-300' onClick={handleRemoveDownvote}>
                 <ThumbDown.Solid size={5} />
                 <p className='ml-2 text-xs font-bold'>{formatNumber(localDislikes)}</p>
             </button>
         ) : (
             <button
-                className='flex items-center text-gray-900 dark:text-slate-300 hover:text-white'
+                className='flex items-center text-slate-700 dark:text-slate-300 hover:text-white'
                 onClick={handleDownvote}>
                 <ThumbDown size={5} />
                 <p className='ml-2 text-xs font-bold'>{formatNumber(localDislikes)}</p>
@@ -86,12 +86,12 @@ const Rating = ({ id, likes = 0, dislikes = 0 }: RatingProps) => {
         <>
             <div className='flex items-center text-slate-300'>
                 {UpvoteButton}
-                <span className='w-1 h-1 mx-1.5 bg-gray-500 rounded-full dark:bg-gray-600'></span>
+                <span className='w-1 h-1 mx-1.5 rounded-full bg-gray-700 dark:bg-gray-600'></span>
                 {DownvoteButton}
             </div>
-            <div className='mt-2 w-full bg-gray-200 rounded-full h-0.5 dark:bg-gray-700'>
+            <div className='mt-2 w-full bg-gray-300 dark:bg-gray-700 rounded-full h-0.5'>
                 <div
-                    className={'bg-gray-600 h-0.5 rounded-full dark:bg-gray-300'}
+                    className={'h-0.5 rounded-full bg-gray-800  dark:bg-gray-300'}
                     style={{ width: `${widthPercentage}%` }}></div>
             </div>
         </>
